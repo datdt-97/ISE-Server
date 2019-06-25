@@ -1,8 +1,8 @@
 const Database = {
-	host: 'ENTER_YOUR_HOST_HERE',
-	databaseName: 'ENTER_YOUR_DATABASE_HERE',
-	user: 'ENTER_YOUR_DATABASE_USERNAME',
-	password: 'ENTER_YOUR_DATABASE_PASSWORD'
+	host: 'db4free.net',
+	databaseName: 'ise_capstone',
+	user: 'datdt123',
+	password: '123456789'
 };
 
 export default Database;

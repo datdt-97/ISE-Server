@@ -38,9 +38,7 @@ app.post('/authenticate', (req, res) => {
 					email: result[0].email,
 					password: result[0].encrypted_password
 				};
-				const token = JWT.sign(payload, app.get('Secret'), {
-					expiresIn: 1440
-				});
+				const token = JWT.sign(payload, app.get('Secret'));
 
 				res.json({
 					code: '200',
