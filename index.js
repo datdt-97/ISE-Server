@@ -28,15 +28,12 @@ app.post('/authenticate', (req, res) => {
 				});
 				throw err;
 			}
-			console.table(result);
 			if (result === undefined || result.length == 0) {
 				res.json({
 					code: '404',
 					token: ''
 				});
 			} else {
-				console.log(`Email: ${result[0].email}`);
-				console.log(`Password: ${result[0].encrypted_password}`);
 				const payload = {
 					email: result[0].email,
 					password: result[0].encrypted_password
@@ -47,7 +44,8 @@ app.post('/authenticate', (req, res) => {
 
 				res.json({
 					code: '200',
-					token: token
+					token: token,
+					user: result[0]
 				});
 			}
 		}
@@ -78,26 +76,44 @@ ProtectedRoutes.use((req, res, next) => {
 	}
 });
 
+const checkResult = (err, result) => {
+	if (err) {
+		return {
+			code: '500',
+			result: ''
+		};
+	}
+	if (result === undefined || result.length === 0) {
+		return {
+			code: '404',
+			result: ''
+		};
+	} else {
+		return {
+			code: '200',
+			result: result
+		};
+	}
+};
+
 ProtectedRoutes.get('/events', (req, res) => {
-	connection.query(Query.select_events, (err, result) => {
-		if (err) {
-			res.json({
-				code: '500',
-				result: ''
-			});
-			throw err;
-		}
-		console.table(result);
-		if (result === undefined || result.length === 0) {
-			res.json({
-				code: '404',
-				result: ''
-			});
-		} else {
-			res.json({
-				code: '200',
-				result: result
-			});
-		}
+	if (req.query.q === undefined) {
+		connection.query(Query.select_events, (err, result) => {
+			res.json(checkResult(err, result));
+		});
+	} else {
+		const sql = connection.format(Query.search_event, [`%${req.query.q}%`]);
+		connection.query(sql, (err, result) => {
+			res.json(checkResult(err, result));
+		});
+	}
+});
+
+ProtectedRoutes.get('/partner/:partnerId', (req, res) => {
+	const sql = connection.format(Query.select_parter_by_id, [
+		req.params.partnerId
+	]);
+	connection.query(sql, (err, result) => {
+		res.json(checkResult(err, result));
 	});
 });

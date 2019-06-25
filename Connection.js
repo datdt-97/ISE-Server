@@ -1,14 +1,15 @@
-const mysql = require('mysql');
+import MySql from 'mysql';
+import Database from './configurations/Database';
 
-const connection = mysql.createConnection({
-	host: 'db4free.net',
-	database: 'ise_capstone',
-	user: 'datdt123',
-	password: '123456789'
+const connection = MySql.createConnection({
+	host: Database.host,
+	database: Database.databaseName,
+	user: Database.user,
+	password: Database.password
 });
 
 connection.connect(err => {
 	if (err) throw err;
 });
 
-module.exports = connection;
+export default connection;
