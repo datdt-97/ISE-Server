@@ -78,13 +78,13 @@ const checkResult = (err, result) => {
 	if (err) {
 		return {
 			code: '500',
-			result: ''
+			result: []
 		};
 	}
 	if (result === undefined || result.length === 0) {
 		return {
 			code: '404',
-			result: ''
+			result: []
 		};
 	} else {
 		return {
