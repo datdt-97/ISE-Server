@@ -115,3 +115,12 @@ ProtectedRoutes.get('/partner/:partnerId', (req, res) => {
 		res.json(checkResult(err, result));
 	});
 });
+
+ProtectedRoutes.get('/major/:majorId', (req, res) => {
+	const sql = connection.format(Query.select_major_by_id, [
+		req.params.majorId
+	]);
+	connection.query(sql, (err, result) => {
+		res.json(checkResult(err, result));
+	});
+});
