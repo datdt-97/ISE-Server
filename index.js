@@ -1,6 +1,7 @@
 import Express from 'express';
 import BodyParser from 'body-parser';
 import JWT from 'jsonwebtoken';
+import ProtectedRoutes from './ProtectedRoutes';
 import Config from './configurations/Config';
 import connection from './Connection';
 import Query from './Query';
@@ -50,97 +51,4 @@ app.post('/authenticate', (req, res) => {
 	);
 });
 
-const ProtectedRoutes = Express.Router();
 app.use('/api', ProtectedRoutes);
-ProtectedRoutes.use((req, res, next) => {
-	var token = req.headers['access-token'];
-	if (token) {
-		// verifies secret and checks if the token is expired
-		JWT.verify(token, app.get('Secret'), (err, decoded) => {
-			if (err) {
-				return res.json({ message: 'invalid token' });
-			} else {
-				// if everything is good, save to request for use in other routes
-				req.decoded = decoded;
-				next();
-			}
-		});
-	} else {
-		// if there is no token
-
-		res.send({
-			message: 'No token provided.'
-		});
-	}
-});
-
-const checkArrayResult = (err, result) => {
-	if (err) {
-		return {
-			code: '500',
-			result: []
-		};
-	}
-	if (result === undefined || result.length === 0) {
-		return {
-			code: '404',
-			result: []
-		};
-	} else {
-		return {
-			code: '200',
-			result: result
-		};
-	}
-};
-
-const checkSingleResult = (err, result) => {
-	if (err) {
-		return {
-			code: '500',
-			result: {}
-		};
-	}
-	if (result === undefined || result.length === 0) {
-		return {
-			code: '404',
-			result: {}
-		};
-	} else {
-		return {
-			code: '200',
-			result: result[0]
-		};
-	}
-};
-
-ProtectedRoutes.get('/events', (req, res) => {
-	if (req.query.q === undefined) {
-		connection.query(Query.select_events, (err, result) => {
-			res.json(checkArrayResult(err, result));
-		});
-	} else {
-		const sql = connection.format(Query.search_event, [`%${req.query.q}%`]);
-		connection.query(sql, (err, result) => {
-			res.json(checkArrayResult(err, result));
-		});
-	}
-});
-
-ProtectedRoutes.get('/partner/:partnerId', (req, res) => {
-	const sql = connection.format(Query.select_parter_by_id, [
-		req.params.partnerId
-	]);
-	connection.query(sql, (err, result) => {
-		res.json(checkSingleResult(err, result));
-	});
-});
-
-ProtectedRoutes.get('/major/:majorId', (req, res) => {
-	const sql = connection.format(Query.select_major_by_id, [
-		req.params.majorId
-	]);
-	connection.query(sql, (err, result) => {
-		res.json(checkSingleResult(err, result));
-	});
-});
