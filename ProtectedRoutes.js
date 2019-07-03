@@ -42,10 +42,26 @@ ProtectedRoutes.get('/events', (req, res) => {
 	}
 });
 
+ProtectedRoutes.get('/event/:eventId', (req, res) => {
+	const sql = connection.format(Query.select_event_by_id, [
+		req.params.eventId
+	]);
+	connection.query(sql, (err, result) => {
+		res.json(Validation.checkSingleResult(err, result));
+	});
+});
+
 ProtectedRoutes.get('/partner/:partnerId', (req, res) => {
 	const sql = connection.format(Query.select_parter_by_id, [
 		req.params.partnerId
 	]);
+	connection.query(sql, (err, result) => {
+		res.json(Validation.checkSingleResult(err, result));
+	});
+});
+
+ProtectedRoutes.get('/user/:userId', (req, res) => {
+	const sql = connection.format(Query.select_user_by_id, [req.params.userId]);
 	connection.query(sql, (err, result) => {
 		res.json(Validation.checkSingleResult(err, result));
 	});
